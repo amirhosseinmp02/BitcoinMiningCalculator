@@ -1,0 +1,188 @@
+﻿@page
+@model BitcoinMiningCalculator.Pages.IndexModel
+
+<!DOCTYPE html>
+
+<html lang="fa">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width , inicial-scale=1.0">
+    <title>ماشین حساب استخراج بیت کوین</title>
+    <link rel="stylesheet" href="~/Css/reset.css">
+    <link rel="stylesheet" href="~/Css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" href="~/Images/logo.png"
+          sizes="32x32">
+</head>
+
+<body>
+
+    <div class="site">
+        <header class="header">
+            <a href="https://amirhosseinmp02.ir"><img src="~/Images/logo.png" alt="Logo"></a>
+            <h1>ماشین حساب استخراج بیت کوین</h1>
+        </header>
+        <main class="main">
+            <div id="fmain">
+                <div class="content">
+                    <h2>
+                        <b>قیمت فعلی BTC</b><br>@Model.BitcoinCalculatorViewModel.BitcoinToUsdPrice.ToString("C0")<br>@Model.BitcoinCalculatorViewModel.BitcoinToTomanPrice.ToString("##,###")
+                        <label><b>تومان</b></label>
+                    </h2>
+                    <h2><b>الگوریتم</b><br>SHA-256<br><b>پاداش بلاک</b><br>@Model.BitcoinCalculatorViewModel.BlockReward</h2>
+                    <h2><b>سختی شبکه</b><br>@($"{Model.BitcoinCalculatorViewModel.NetworkDifficulty.ToString().Substring(0, 8)}M")<br><b>دلار سنا</b><br>@Model.BitcoinCalculatorViewModel.UsdToTomanPrice.ToString("##,###") تومان</h2>
+                </div>
+                <form class="form">
+                    <div>
+                        <input type="number" step="any" placeholder="هش ریت (TH/s)" asp-for="BitcoinCalculatorViewModel.HashRate" id="hashtext">
+                        <select id="hashselect" onchange="hash();">
+                            <option value="14.5" id="1350" selected="selected">Antminer S9j</option>
+                            <option value="10" id="1432">Antminer T9+</option>
+                            <option value="68" id="3360">Whatsminer M20S</option>
+                            <option value="56" id="3360">Whatsminer M21S</option>
+                            <option value="12.5" id="2050">Whatsminer M3 V2</option>
+                            <option value="11.5" id="2000">Whatsminer M3 V1</option>
+                            <option value="56" id="2520">Antminer S17</option>
+                            <option value="13.5" id="1420">Ebit E9i</option>
+                            <option value="20.5" id="1530">Antminer S11</option>
+                            <option value="40" id="2200">Antminer T17</option>
+                            <option value="18" id="1650">Ebit E10</option>
+                            <option value="custom">سایر</option>
+                        </select>
+                    </div>
+                    <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.ElectricityConsumed" id="wselect" placeholder="برق مصرفی (W)">
+                    <div>
+                        <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.CostPerKilowattOfElectricity" id="electext" placeholder="هزینه هر کیلووات (تومان)">
+                        <select id="elecselect" onchange="elec();">
+                            <option value="290" selected="selected">خانگی</option>
+                            <option value="92">صنعتی</option>
+                            <option value="52">کشاورزی</option>
+                            <option value="965">متوسط صادراتی</option>
+                        </select>
+                    </div>
+
+                    <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.PoolFee" placeholder="کارمزد استخر">
+                    <input type="hidden" asp-for="BitcoinCalculatorViewModel.BlockReward" />
+                    <input type="hidden" asp-for="BitcoinCalculatorViewModel.NetworkDifficulty" />
+                    <input type="hidden" asp-for="BitcoinCalculatorViewModel.BitcoinToUsdPrice" />
+                    <input type="hidden" asp-for="BitcoinCalculatorViewModel.BitcoinToTomanPrice" />
+                    @Html.AntiForgeryToken()
+                    <button>محاسبه</button>
+                    <span id="loading">در حال محاسبه...</span>
+                    <div id="error"></div>
+                </form>
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <th></th>
+                        <th><b>بیتکوین</b></th>
+                        <th><b>دلار</b></th>
+                        <th><b>برق</b></th>
+                        <th><b>تومان</b></th>
+                    </tr>
+                    <tr>
+                        <th><b>روزانه</b></th>
+                        <th id="bitcoin_day">0</th>
+                        <th id="dollar_day">0</th>
+                        <th id="bargh_day">0</th>
+                        <th id="toman_day">0</th>
+                    </tr>
+                    <tr>
+                        <th><b>هفتگی</b></th>
+                        <th id="bitcoin_week">0</th>
+                        <th id="dollar_week">0</th>
+                        <th id="bargh_week">0</th>
+                        <th id="toman_week">0</th>
+                    </tr>
+                    <tr>
+                        <th><b>ماهانه</b></th>
+                        <th id="bitcoin_month">0</th>
+                        <th id="dollar_month">0</th>
+                        <th id="bargh_month">0</th>
+                        <th id="toman_month">0</th>
+                    </tr>
+                    <tr>
+                        <th><b>سالانه</b></th>
+                        <th id="bitcoin_year">0</th>
+                        <th id="dollar_year">0</th>
+                        <th id="bargh_year">0</th>
+                        <th id="toman_year">0</th>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+        <footer class="footer">
+            <h2>ما را در شبکه های اجتماعی دنبال کنید</h2>
+            <div class="social">
+                <a href="#"><i class="fa fa-telegram" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/Js/jquery-3.6.0.min.js"></script>
+    <script src="~/Js/app.js"></script>
+    <script>
+    $(function() {
+        $("#loading").hide();
+        $('form').on('submit',
+            function(e) {
+                e.preventDefault();
+                $("#error").hide();
+                $("#loading").show();
+
+                $.ajax({
+                    type: 'post',
+                    url: "/",
+                    data: $('form').serialize(),
+                    success: function (data) {
+                        $("#loading").hide();
+
+                        $("#bargh_day").text(data.electricityConsumedCostForADay);
+                        $("#bargh_week").text(data.electricityConsumedCostForAWeek);
+                        $("#bargh_month").text(data.electricityConsumedCostForAMonth);
+                        $("#bargh_year").text(data.electricityConsumedCostForAYear);
+
+                        $("#bitcoin_day").text(data.bitcoinADayIncome);
+                        $("#bitcoin_week").text(data.bitcoinAWeekIncome);
+                        $("#bitcoin_month").text(data.bitcoinAMonthIncome);
+                        $("#bitcoin_year").text(data.bitcoinAYearIncome);
+
+                        $("#dollar_day").text(data.usdADayIncome);
+                        $("#dollar_week").text(data.usdAWeekIncome);
+                        $("#dollar_month").text(data.usdAMonthIncome);
+                        $("#dollar_year").text(data.usdAYearIncome);
+
+                        $("#toman_day").text(data.finalADayIncomeInToman);
+                        $("#toman_week").text(data.finalAWeekIncomeInToman);
+                        $("#toman_month").text(data.finalAMonthIncomeInToman);
+                        $("#toman_year").text(data.finalAYearIncomeInToman);
+
+                        $("#error").text("");
+
+                        ConvertNumbersToPersian();
+
+                        $("input[name=__RequestVerificationToken]").remove();
+
+                        $("form").append('@Html.AntiForgeryToken()');
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $("#loading").hide();
+
+                        $("#error").show();
+                        $("#error").text("لطفا مقادیر را درست وارد نمایید");
+
+                        $("input[name=__RequestVerificationToken]").remove();
+
+                        $("form").append('@Html.AntiForgeryToken()');
+                    }
+                });
+            });
+    });
+    </script>
+
+</body>
+
+</html>
