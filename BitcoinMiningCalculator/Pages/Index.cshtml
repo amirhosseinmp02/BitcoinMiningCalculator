@@ -35,7 +35,7 @@
                 </div>
                 <form class="form">
                     <div>
-                        <input type="number" step="any" placeholder="هش ریت (TH/s)" asp-for="BitcoinCalculatorViewModel.HashRate" id="hashtext">
+                        <input type="number" step="any" placeholder="هش ریت (TH/s)" name="BitcoinCalculatorViewModel.HashRate" id="hashtext">
                         <select id="hashselect" onchange="hash();">
                             <option value="14.5" id="1350" selected="selected">Antminer S9j</option>
                             <option value="10" id="1432">Antminer T9+</option>
@@ -51,9 +51,9 @@
                             <option value="custom">سایر</option>
                         </select>
                     </div>
-                    <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.ElectricityConsumed" id="wselect" placeholder="برق مصرفی (W)">
+                    <input type="number" step="any" name="BitcoinCalculatorViewModel.ElectricityConsumed" id="wselect" placeholder="برق مصرفی (W)">
                     <div>
-                        <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.CostPerKilowattOfElectricity" id="electext" placeholder="هزینه هر کیلووات (تومان)">
+                        <input type="number" step="any" name="BitcoinCalculatorViewModel.CostPerKilowattOfElectricity" id="electext" placeholder="هزینه هر کیلووات (تومان)">
                         <select id="elecselect" onchange="elec();">
                             <option value="290" selected="selected">خانگی</option>
                             <option value="92">صنعتی</option>
@@ -62,7 +62,7 @@
                         </select>
                     </div>
 
-                    <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.PoolFee" placeholder="کارمزد استخر">
+                    <input type="number" step="any" name="BitcoinCalculatorViewModel.PoolFee" placeholder="کارمزد استخر">
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.BlockReward" />
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.NetworkDifficulty" />
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.BitcoinToUsdPrice" />
