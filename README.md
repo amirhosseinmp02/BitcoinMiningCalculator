@@ -1,6 +1,6 @@
 # BitcoinMiningCalculator
-A Bitcoin Mining Calculator Using Asp.Net Core Razor Pages Technology 
+A Bitcoin mining calculator using ASP.NET Core razor pages technology
 
-Just Put Last Release Package In Your Server/Host That Support ASP.NET CORE 3.1
+Just put last release package in your server/host that support asp.Net core 3.1
 
-For Php Version Visit https://github.com/amirhosseinmp02/BitcoinMiningCalculatorUsingPhp
+Visit https://github.Com/amirhosseinmp02/bitcoinminingcalculatorusingphp for php version 
