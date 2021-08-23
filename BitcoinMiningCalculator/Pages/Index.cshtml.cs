@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using BitcoinMiningCalculator.Models;
 using BitcoinMiningCalculator.Models.JsonModels.CoinDeskModels;
+using BitcoinMiningCalculator.Models.JsonModels.FiatModels;
 using BitcoinMiningCalculator.Models.JsonModels.LastBitcoinBlockModels;
 using BitcoinMiningCalculator.Models.JsonModels.RasterModels;
 using Newtonsoft.Json;
@@ -26,37 +27,34 @@ namespace BitcoinMiningCalculator.Pages
             _httpClient = new HttpClient();
         }
 
-        public void OnGet()
+        public async Task OnGet()
         {
             var coinDeskResult =
                 _httpClient
-                    .GetStringAsync("https://api.coindesk.com/v1/bpi/currentprice/btc.json")
-                    .Result;
+                    .GetStringAsync("https://api.coindesk.com/v1/bpi/currentprice/btc.json");
 
-            var coinDeskModel =
-                JsonConvert
-                    .DeserializeObject<CoinDeskModel>(coinDeskResult);
-
-            var rasterResult =
+            var fiatResult =
                 _httpClient
-                    .GetStringAsync("https://raters.ir/exchange/api/currency/usd")
-                    .Result;    
-
-            var rasterModel =   
-                JsonConvert
-                    .DeserializeObject<RasterModel>(rasterResult);
+                    .GetStringAsync("https://dapi.p3p.repl.co/api/?currency=usd");
 
             var lastBitcoinBlockResult =
                 _httpClient
-                    .GetStringAsync("https://chain.api.btc.com/v3/block/latest")
-                    .Result;
+                    .GetStringAsync("https://chain.api.btc.com/v3/block/latest");
+
+            var coinDeskModel =
+                JsonConvert
+                    .DeserializeObject<CoinDeskModel>(await coinDeskResult);
+
+            var fiatModel =   
+                JsonConvert
+                    .DeserializeObject<FiatModel>(await fiatResult);
 
             var lastBitcoinModel =
                 JsonConvert
-                    .DeserializeObject<LastBitcoinBlockModel>(lastBitcoinBlockResult);
+                    .DeserializeObject<LastBitcoinBlockModel>(await lastBitcoinBlockResult);
 
             var usdToTomanPrice =
-                ((Convert.ToInt32(rasterModel.Data.Prices[0].Live.Replace(",","")) / 10));
+                Convert.ToInt32(fiatModel.Price) / 10;
 
             var bitcoinToUsdPriceInteger =
                 Convert.ToInt32(coinDeskModel.Bpi.USD.Rate_Float);
