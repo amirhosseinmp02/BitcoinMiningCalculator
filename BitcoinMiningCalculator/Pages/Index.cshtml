@@ -33,9 +33,18 @@
                     <h2><b>الگوریتم</b><br>SHA-256<br><b>پاداش بلاک</b><br>@Model.BitcoinCalculatorViewModel.BlockReward</h2>
                     <h2><b>سختی شبکه</b><br>@($"{Model.BitcoinCalculatorViewModel.NetworkDifficulty.ToString().Substring(0, 8)}M")<br><b>دلار سنا</b><br>@Model.BitcoinCalculatorViewModel.UsdToTomanPrice.ToString("##,###") تومان</h2>
                 </div>
-                <form class="form">
+                <form class="form"
+                      role="form"
+                      action="/"
+                      asp-antiforgery="true"
+                      data-ajax="true"
+                      data-ajax-loading="#loading"
+                      data-ajax-method="POST"
+                      data-ajax-success="SuccessSubmit"
+                      data-ajax-failure="FailureSubmit">
                     <div>
-                        <input type="number" step="any" placeholder="هش ریت (TH/s)" name="BitcoinCalculatorViewModel.HashRate" id="hashtext">
+                        <input type="number" step="any" placeholder="هش ریت (TH/s)" asp-for="BitcoinCalculatorViewModel.HashRate" id="hashtext">
+                        
                         <select id="hashselect" onchange="hash();">
                             <option value="14.5" id="1350" selected="selected">Antminer S9j</option>
                             <option value="10" id="1432">Antminer T9+</option>
@@ -51,9 +60,11 @@
                             <option value="custom">سایر</option>
                         </select>
                     </div>
-                    <input type="number" step="any" name="BitcoinCalculatorViewModel.ElectricityConsumed" id="wselect" placeholder="برق مصرفی (W)">
+                    <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.ElectricityConsumed" id="wselect" placeholder="برق مصرفی (W)">
+                    
                     <div>
-                        <input type="number" step="any" name="BitcoinCalculatorViewModel.CostPerKilowattOfElectricity" id="electext" placeholder="هزینه هر کیلووات (تومان)">
+                        <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.CostPerKilowattOfElectricity" id="electext" placeholder="هزینه هر کیلووات (تومان)">
+                        
                         <select id="elecselect" onchange="elec();">
                             <option value="290" selected="selected">خانگی</option>
                             <option value="92">صنعتی</option>
@@ -62,14 +73,15 @@
                         </select>
                     </div>
 
-                    <input type="number" step="any" name="BitcoinCalculatorViewModel.PoolFee" placeholder="کارمزد استخر">
+                    <input type="number" step="any" asp-for="BitcoinCalculatorViewModel.PoolFee" placeholder="کارمزد استخر">
+                    
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.BlockReward" />
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.NetworkDifficulty" />
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.BitcoinToUsdPrice" />
                     <input type="hidden" asp-for="BitcoinCalculatorViewModel.BitcoinToTomanPrice" />
-                    @Html.AntiForgeryToken()
                     <button>محاسبه</button>
-                    <span id="loading">در حال محاسبه...</span>
+                    <div asp-validation-summary="None"></div>
+                    <span id="loading" style="display: none;">در حال محاسبه...</span>
                     <div id="error"></div>
                 </form>
             </div>
@@ -120,65 +132,43 @@
         </footer>
     </div>
 
-    <script src="~/Js/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="~/Js/app.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js" integrity="sha512-DedNBWPF0hLGUPNbCYfj8qjlEnNE92Fqn7xd3Sscfu7ipy7Zu33unHdugqRD3c4Vj7/yLv+slqZhMls/4Oc7Zg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-    $(function() {
-        $("#loading").hide();
-        $('form').on('submit',
-            function(e) {
-                e.preventDefault();
-                $("#error").hide();
-                $("#loading").show();
+        SuccessSubmit = function (response) {
+            $("#error").hide();
 
-                $.ajax({
-                    type: 'post',
-                    url: "/",
-                    data: $('form').serialize(),
-                    success: function (data) {
-                        $("#loading").hide();
+            $("#bargh_day").text(response.electricityConsumedCostForADay);
+            $("#bargh_week").text(response.electricityConsumedCostForAWeek);
+            $("#bargh_month").text(response.electricityConsumedCostForAMonth);
+            $("#bargh_year").text(response.electricityConsumedCostForAYear);
 
-                        $("#bargh_day").text(data.electricityConsumedCostForADay);
-                        $("#bargh_week").text(data.electricityConsumedCostForAWeek);
-                        $("#bargh_month").text(data.electricityConsumedCostForAMonth);
-                        $("#bargh_year").text(data.electricityConsumedCostForAYear);
+            $("#bitcoin_day").text(response.bitcoinADayIncome);
+            $("#bitcoin_week").text(response.bitcoinAWeekIncome);
+            $("#bitcoin_month").text(response.bitcoinAMonthIncome);
+            $("#bitcoin_year").text(response.bitcoinAYearIncome);
 
-                        $("#bitcoin_day").text(data.bitcoinADayIncome);
-                        $("#bitcoin_week").text(data.bitcoinAWeekIncome);
-                        $("#bitcoin_month").text(data.bitcoinAMonthIncome);
-                        $("#bitcoin_year").text(data.bitcoinAYearIncome);
+            $("#dollar_day").text(response.usdADayIncome);
+            $("#dollar_week").text(response.usdAWeekIncome);
+            $("#dollar_month").text(response.usdAMonthIncome);
+            $("#dollar_year").text(response.usdAYearIncome);
 
-                        $("#dollar_day").text(data.usdADayIncome);
-                        $("#dollar_week").text(data.usdAWeekIncome);
-                        $("#dollar_month").text(data.usdAMonthIncome);
-                        $("#dollar_year").text(data.usdAYearIncome);
+            $("#toman_day").text(response.finalADayIncomeInToman);
+            $("#toman_week").text(response.finalAWeekIncomeInToman);
+            $("#toman_month").text(response.finalAMonthIncomeInToman);
+            $("#toman_year").text(response.finalAYearIncomeInToman);
 
-                        $("#toman_day").text(data.finalADayIncomeInToman);
-                        $("#toman_week").text(data.finalAWeekIncomeInToman);
-                        $("#toman_month").text(data.finalAMonthIncomeInToman);
-                        $("#toman_year").text(data.finalAYearIncomeInToman);
+            $("#error").text("");
 
-                        $("#error").text("");
+            ConvertNumbersToPersian();
+    };
 
-                        ConvertNumbersToPersian();
-
-                        $("input[name=__RequestVerificationToken]").remove();
-
-                        $("form").append('@Html.AntiForgeryToken()');
-                    },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        $("#loading").hide();
-
-                        $("#error").show();
-                        $("#error").text("لطفا مقادیر را درست وارد نمایید");
-
-                        $("input[name=__RequestVerificationToken]").remove();
-
-                        $("form").append('@Html.AntiForgeryToken()');
-                    }
-                });
-            });
-    });
+    FailureSubmit = function (xhr) {
+        $('#error').text("مشکلی در زمان محاسبه رخ داد .");
+        $('#error').show();
+    };
     </script>
 
 </body>

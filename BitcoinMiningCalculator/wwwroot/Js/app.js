@@ -1,22 +1,17 @@
-function hash(){
-var b0=document.getElementById("hashselect");
-var b1=b0.options[b0.selectedIndex].value;
-var b2=b0.options[b0.selectedIndex].id;
-document.getElementById("hashtext").value=b1;
-document.getElementById("wselect").value=b2;
+
+function hash() {
+    var b0 = document.getElementById("hashselect");
+    var b1 = b0.options[b0.selectedIndex].value;
+    var b2 = b0.options[b0.selectedIndex].id;
+    document.getElementById("hashtext").value = b1;
+    document.getElementById("wselect").value = b2;
 }
-function elec(){
-var a0=document.getElementById("elecselect");
-var a1=a0.options[a0.selectedIndex].value;
-document.getElementById("electext").value=a1;
-	}
-	function FF1(){
-		// if (document.getElementsByTagName("th").innerHTML=="تومان") {
-		// 	document.getElementsByTagName.innerHTML = "0";
-		// }
-		// document.body.innerHTML = document.body.innerHTML.replace('ریال','0');
-		alert("asdasd");
-	}
+
+function elec() {
+    var a0 = document.getElementById("elecselect");
+    var a1 = a0.options[a0.selectedIndex].value;
+    document.getElementById("electext").value = a1;
+}
 
 
 $(document).ready(function () {

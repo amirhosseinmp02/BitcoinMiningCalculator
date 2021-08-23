@@ -45,7 +45,7 @@ namespace BitcoinMiningCalculator.Pages
                 JsonConvert
                     .DeserializeObject<CoinDeskModel>(await coinDeskResult);
 
-            var fiatModel =   
+            var fiatModel =
                 JsonConvert
                     .DeserializeObject<FiatModel>(await fiatResult);
 
@@ -143,13 +143,13 @@ namespace BitcoinMiningCalculator.Pages
                 ((BitcoinCalculatorViewModel.ElectricityConsumed *
                   BitcoinCalculatorViewModel.CostPerKilowattOfElectricity) * (24 * day));
 
-            return electricityCost;
+            return electricityCost ?? 0;
         }
 
         private decimal BitcoinIncomeCalculation(int day)
         {
             var income =
-                ((day) * ((BitcoinCalculatorViewModel.HashRate * Math.Pow(10,12)) * BitcoinCalculatorViewModel.BlockReward * 86400) /
+                ((day) * ((BitcoinCalculatorViewModel.HashRate * Math.Pow(10, 12)) * BitcoinCalculatorViewModel.BlockReward * 86400) /
                  (BitcoinCalculatorViewModel.NetworkDifficulty * Math.Pow(2, 32)));
 
             var poolCommission =
