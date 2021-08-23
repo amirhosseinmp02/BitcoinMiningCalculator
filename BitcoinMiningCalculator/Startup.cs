@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebMarkupMin.AspNetCore3;
 
 namespace BitcoinMiningCalculator
 {
@@ -23,6 +24,11 @@ namespace BitcoinMiningCalculator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddWebMarkupMin()
+                .AddHtmlMinification()
+                .AddHttpCompression()
+                .AddXmlMinification();
+
             services.AddRazorPages();
         }
 
