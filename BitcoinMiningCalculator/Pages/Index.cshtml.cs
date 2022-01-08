@@ -18,43 +18,56 @@ namespace BitcoinMiningCalculator.Pages
 {
     public class IndexModel : PageModel
     {
+        private readonly IHttpClientFactory _httpClientFactory;
+
         [BindProperty]
         public BitcoinCalculatorViewModel BitcoinCalculatorViewModel { get; set; }
-        private readonly HttpClient _httpClient;
 
-        public IndexModel()
+        public IndexModel(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = new HttpClient();
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task OnGet()
         {
+            var httpClient = _httpClientFactory.CreateClient();
+
             var coinDeskResult =
-                _httpClient
-                    .GetStringAsync("https://api.coindesk.com/v1/bpi/currentprice/btc.json");
+            httpClient
+                .GetStringAsync("https://api.coindesk.com/v1/bpi/currentprice/btc.json");
 
             var fiatResult =
-                _httpClient
+                httpClient
                     .GetStringAsync("https://dapi.p3p.repl.co/api/?currency=usd");
 
             var lastBitcoinBlockResult =
-                _httpClient
+                httpClient
                     .GetStringAsync("https://chain.api.btc.com/v3/block/latest");
 
             var coinDeskModel =
                 JsonConvert
                     .DeserializeObject<CoinDeskModel>(await coinDeskResult);
 
-            var fiatModel =
+            FiatModel fiatModel;
+
+            try
+            {
+                fiatModel =
                 JsonConvert
                     .DeserializeObject<FiatModel>(await fiatResult);
+            }
+            catch
+            {
+                fiatModel = null;
+            }
 
             var lastBitcoinModel =
                 JsonConvert
                     .DeserializeObject<LastBitcoinBlockModel>(await lastBitcoinBlockResult);
 
             var usdToTomanPrice =
-                Convert.ToInt32(fiatModel.Price) / 10;
+                fiatModel != null ? (Convert.ToInt32(fiatModel.Price) / 10) :
+                27115;
 
             var bitcoinToUsdPriceInteger =
                 Convert.ToInt32(coinDeskModel.Bpi.USD.Rate_Float);
