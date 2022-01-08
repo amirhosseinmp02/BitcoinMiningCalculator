@@ -61,9 +61,18 @@ namespace BitcoinMiningCalculator.Pages
                 fiatModel = null;
             }
 
-            var lastBitcoinModel =
+            LastBitcoinBlockModel lastBitcoinModel;
+
+            try
+            {
+                lastBitcoinModel =
                 JsonConvert
                     .DeserializeObject<LastBitcoinBlockModel>(await lastBitcoinBlockResult);
+            }
+            catch
+            {
+                lastBitcoinModel = null;
+            }
 
             var usdToTomanPrice =
                 fiatModel != null ? (Convert.ToInt32(fiatModel.Price) / 10) :
@@ -78,7 +87,7 @@ namespace BitcoinMiningCalculator.Pages
             BitcoinCalculatorViewModel = new BitcoinCalculatorViewModel()
             {
                 BlockReward = 6.25,
-                NetworkDifficulty = lastBitcoinModel.Data.Difficulty,
+                NetworkDifficulty = lastBitcoinModel != null ? lastBitcoinModel.Data.Difficulty : 24371874614345,
                 UsdToTomanPrice = usdToTomanPrice,
                 BitcoinToUsdPrice = bitcoinToUsdPriceInteger,
                 BitcoinToTomanPrice = bitcoinToTomanPriceInteger
